@@ -1,0 +1,9 @@
+.vs/
+binaries/
+intermediate/
+
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj
+*.user
