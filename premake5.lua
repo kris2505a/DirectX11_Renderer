@@ -5,7 +5,7 @@ workspace "Mira"
         "Debug", "Release"
     }
 	
-	-- startproject "Sandbox"
+	startproject "Project-SideScroller"
 	
 outputDir = "%{cfg.buildcfg}-%{cfg.architecture}" 
 
@@ -57,7 +57,7 @@ project "MiraEngine"
     }
 	
 	postbuildcommands {
-		"{COPY} %{cfg.buildtarget.abspath} ../binaries/" .. outputDir .. "/Sandbox"
+		"{COPY} %{cfg.buildtarget.abspath} ../binaries/" .. outputDir .. "/Game"
 	}
 
 
@@ -83,67 +83,67 @@ project "MiraEngine"
         runtime "Release"
         optimize "On"
 
--- project "Sandbox"
---     location "Sandbox"
---     kind "consoleApp"
---     language "C++"
---     staticruntime "Off"
+project "Game"
+    location "Game"
+    kind "consoleApp"
+    language "C++"
+    staticruntime "Off"
 
 
---     targetdir("binaries/" .. outputDir .. "/%{prj.name}")
---     objdir("intermediate/" .. outputDir .. "/%{prj.name}")
+    targetdir("binaries/" .. outputDir .. "/%{prj.name}")
+    objdir("intermediate/" .. outputDir .. "/%{prj.name}")
 
---     files {
---         "%{prj.name}/sources/**.h",
---         "%{prj.name}/sources/**.cpp"
---     }
+    files {
+        "%{prj.name}/sources/**.h",
+        "%{prj.name}/sources/**.cpp"
+    }
 
---     includedirs {
---         "%{IncludeDirectories.SFML}/include",
---         "%{prj.name}/sources",
--- 		"MiraEngine/sources/"
---     }
+    includedirs {
+        "%{IncludeDirectories.SFML}/include",
+        "%{prj.name}/sources",
+		"MiraEngine/sources/"
+    }
 
---     libdirs {
--- 		"%{IncludeDirectories.SFML}/lib"
---     }
-    
---     links {
---         "opengl32.lib",
--- 		"winmm.lib",
--- 		"gdi32.lib",
--- 		"MiraEngine",
---     }
+    libdirs {
+		"%{IncludeDirectories.SFML}/lib"
+    }
+   
+    links {
+        "opengl32.lib",
+		"winmm.lib",
+		"gdi32.lib",
+		"MiraEngine",
+    }
 
---     filter "system:windows"
---         cppdialect "C++20"
---         staticruntime "Off"
---         systemversion "latest"
+    filter "system:windows"
+        cppdialect "C++20"
+        staticruntime "Off"
+        systemversion "latest"
 
---     defines {
+    defines {
 	
---     }
+    }
 
---     filter "configurations:Debug" 
---         links {
---             "sfml-audio-d.lib",
---             "sfml-graphics-d.lib",
---             "sfml-window-d.lib",
---             "sfml-main-d.lib",
---             "sfml-system-d.lib"
---         }
---         runtime "Debug"
---         symbols "On"
+    filter "configurations:Debug" 
+        links {
+            "sfml-audio-d.lib",
+            "sfml-graphics-d.lib",
+            "sfml-window-d.lib",
+            "sfml-main-d.lib",
+            "sfml-system-d.lib"
+        }
+        runtime "Debug"
+        symbols "On"
 
---     filter "configurations:Release"
---         links {
---             "sfml-audio.lib",
---             "sfml-graphics.lib",
---             "sfml-window.lib",
---             "sfml-main.lib",
---             "sfml-system.lib"
---         }
---         runtime "Release"
---         optimize "On"
+    filter "configurations:Release"
+        links {
+            "sfml-audio.lib",
+            "sfml-graphics.lib",
+            "sfml-window.lib",
+            "sfml-main.lib",
+            "sfml-system.lib"
+        }
+        runtime "Release"
+        optimize "On"
 
 	
