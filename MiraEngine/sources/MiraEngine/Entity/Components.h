@@ -18,11 +18,12 @@ struct MIRA_API CameraComponent {
 	Vec2Df size;	
 	float zoom;
 	sf::View camera;
-	CameraComponent(const Vec2Df& _position = {0.0f, 0.0f}, const Vec2Df& _size = {100.f, 100.f}, float _zoom = 1.0f) 
+	CameraComponent(const Vec2Df& _position = {0.0f, 0.0f}, const Vec2Df& _size = {200.f, 100.f}, float _zoom = 1.0f) 
 		: position(_position), size(_size), zoom(_zoom) {
 		camera.setSize(size);
 		camera.setCenter(position);
 		camera.zoom(zoom);
+		GameApp::getInstance()->getRenderer()->getRenderer()->setView(this->camera);
 	}
 };
 

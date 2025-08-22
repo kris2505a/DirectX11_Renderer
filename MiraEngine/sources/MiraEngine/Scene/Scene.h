@@ -25,6 +25,7 @@ public:
 		ent->m_entityId = m_entityIdGenerator++;
 		m_entities.push_back(ent);
 		m_transformComponents[ent->m_entityId] = TransformComponent();
+		m_cameraComponents[ent->m_entityId] = CameraComponent();
 	}
 
 	uint32_t getId() const;
@@ -38,6 +39,7 @@ private:
 	std::string m_name;
 	static uint32_t m_entityIdGenerator;
 	std::unordered_map <uint32_t, TransformComponent> m_transformComponents;
+	std::unordered_map <uint32_t, CameraComponent> m_cameraComponents;
 };
 
 }//namespace ends

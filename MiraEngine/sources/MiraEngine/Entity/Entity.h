@@ -16,7 +16,7 @@ public:
 	virtual void render(Renderer* renderer);
 	virtual void handleInput(float deltaTime);
 
-private:
+protected:
 	class Scene* p_scene;
 	uint32_t m_entityId;
 };
