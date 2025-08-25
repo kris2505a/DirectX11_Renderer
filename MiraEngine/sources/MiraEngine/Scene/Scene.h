@@ -3,6 +3,7 @@
 #include <MiraEngine/Entity/Entity.h>
 #include <MiraEngine/Renderer/Renderer.h>
 #include <MiraEngine/Entity/Components.h>
+#include <MiraEngine/Core/MiraMacros.h>
 #include <memory>
 #include <vector>
 
@@ -11,35 +12,58 @@ namespace Mira {
 class MIRA_API Scene {
 
 public:
-	Scene(uint32_t _sceneId = 0, const std::string& _name = "Scene");
+	Scene(MiraId _sceneId = 0, const std::string& _name = "Scene");
 	~Scene();
+	void init();
 	void update(float deltaTime);
 	void render(Renderer* renderer);
 	virtual void handleInput(float deltaTime);
 	std::vector<Entity*>& getEntities();
 	
 	template <typename T> 
-	void createEntity() {
-		Entity* ent = new T;
-		ent->p_scene = this;
-		ent->m_entityId = m_entityIdGenerator++;
+	inline T* createEntity() {
+		T* ent = new T;
+		ent->Entity::p_scene = this;
+		m_entityIdGenerator++;
+		ent->m_entityId = m_entityIdGenerator;
+		
+		auto* transform = new TransformComponent;
+		m_transformComponents.push_back(transform);
+		ent->p_transform = transform;
 		m_entities.push_back(ent);
-		m_transformComponents[ent->m_entityId] = TransformComponent();
-		m_cameraComponents[ent->m_entityId] = CameraComponent();
+
+		return ent;
 	}
 
-	uint32_t getId() const;
+	MiraId getId() const;
 	const std::string& getName() const;
+	
+	Entity* getEntityById(MiraId id) const;
+
+
+public:
+	template <typename T>
+	inline T* createComponent(MiraId id) {
+		static_assert (false);
+	}
+
+	template<>
+	CameraComponent* createComponent(MiraId id);
+	template<>
+	RigidBodyComponent* createComponent(MiraId id);
 
 protected:
 	std::vector<Entity*> m_entities;
 
 private:
-	uint32_t m_sceneId;
+	MiraId m_sceneId;
 	std::string m_name;
-	static uint32_t m_entityIdGenerator;
-	std::unordered_map <uint32_t, TransformComponent> m_transformComponents;
-	std::unordered_map <uint32_t, CameraComponent> m_cameraComponents;
+	MiraId m_entityIdGenerator = 0;
+	std::vector <TransformComponent*> m_transformComponents;
+	std::vector <CameraComponent*> m_cameraComponents;
+	std::vector <RigidBodyComponent*> m_rigidBodyComponents;
+
+	
 };
 
 }//namespace ends

@@ -2,6 +2,14 @@
 
 class Player : public Mira::Entity {
 public:
+
+	virtual void construct() {
+		m_camera = p_scene->createComponent <Mira::CameraComponent>(getCurrentId());
+	}
+
+	virtual void init() {
+		
+	}
 	virtual void update(float deltatime) {
 
 	}
@@ -9,6 +17,12 @@ public:
 		renderer->getRenderer()->draw(m_sprite);
 	}
 	virtual void handleInput(float deltaTime) {
+		if (Mira::Input::isKeyPressed(sf::Keyboard::Left)) {
+			m_camera->position.x -= 5000 * deltaTime;
+		}
+		if (Mira::Input::isKeyPressed(sf::Keyboard::Right)) {
+			m_camera->position.x += 5000 * deltaTime;
+		}
 
 	}
 
@@ -16,12 +30,14 @@ public:
 		auto texture = m_texture.loadFromFile("textures/player.png");
 		MIRA_ASSERT(texture, "Unable to load Texture");
 		m_sprite.setTexture(m_texture);
+		//auto rb = p_scene->createComponent <Mira::RigidBodyComponent>(m_entityId);
 	}
 	~Player() = default;
 
 private:
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
+	Mira::CameraComponent* m_camera;
 };
 
 class World : public Mira::Scene {

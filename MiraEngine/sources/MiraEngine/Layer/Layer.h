@@ -35,7 +35,7 @@ public:
 
 protected:
 	std::vector <std::unique_ptr <Scene>> m_scenes;
-	static uint32_t s_idGenerator;
+	static MiraId s_idGenerator;
 	int m_currentSceneIndex = 0;
 };
 

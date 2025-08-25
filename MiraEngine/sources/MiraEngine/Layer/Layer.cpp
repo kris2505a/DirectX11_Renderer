@@ -4,10 +4,12 @@
 
 namespace Mira {
 
-uint32_t Layer::s_idGenerator = 0;
+MiraId Layer::s_idGenerator = 0;
 
 void Layer::onAttach() {
-	m_scenes.push_back(std::make_unique<Scene>(s_idGenerator++, "Mira Scene"));
+	for (auto& iter : m_scenes) {
+		iter->init();
+	}
 }
 
 void Layer::onDetach() {

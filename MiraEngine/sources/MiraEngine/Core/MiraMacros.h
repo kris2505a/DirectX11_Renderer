@@ -8,3 +8,4 @@
 		MIRA_LOG(ERROR, msg); \
 		std::abort(); } 
 		
+#define MiraId uint32_t
