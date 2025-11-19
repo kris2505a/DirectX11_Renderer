@@ -1,7 +1,8 @@
 #include "IndexBuffer.h"
 #include "ErrorH.h"
 
-IndexBuffer::IndexBuffer(const void* data, int size, unsigned int offset) : m_offset(offset){
+IndexBuffer::IndexBuffer(const void* data, int size, unsigned int count, unsigned int offset) 
+	: m_count(count), m_offset(offset){
 	D3D11_BUFFER_DESC ibd = {};
 	ibd.Usage = D3D11_USAGE_DYNAMIC;
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -25,4 +26,8 @@ void IndexBuffer::unbind() const {
 	UINT stride = 0;
 	UINT offset = 0;
 	context()->IASetIndexBuffer(nullBuffer, DXGI_FORMAT_UNKNOWN, offset);
+}
+
+unsigned int IndexBuffer::getIndexCount() const {
+	return m_count;
 }

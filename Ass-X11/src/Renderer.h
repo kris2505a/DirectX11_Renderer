@@ -22,6 +22,7 @@ private:
 	void createViewport();
 	void createDepthStencil();
 	void setViewPortAndDepthStencil();
+	void createSamplerState();
 
 private:
 	wrl::ComPtr <ID3D11Device> m_device;
@@ -29,8 +30,11 @@ private:
 	wrl::ComPtr <IDXGISwapChain> m_swapchain;
 	wrl::ComPtr <ID3D11RenderTargetView> m_targetView;
 	wrl::ComPtr <ID3D11DepthStencilView> m_stencilView;
+	wrl::ComPtr <ID3D11SamplerState> m_samplerState;
 
 	float m_clearColor[4];
+
+	DirectX::XMMATRIX m_view, m_projection;
 
 private:
 	static Renderer* s_instance;

@@ -1,6 +1,13 @@
+Texture2D tex : register(t0);
+SamplerState samp : register(s0);
 
-float4 main() : SV_TARGET
+struct VSOut
 {
-    
-    return float4(0.0f, 1.0f, 1.0f, 1.0f);
+    float4 position     : SV_POSITION;
+    float4 color        : COLOR;
+};
+
+float4 main(VSOut input) : SV_TARGET
+{
+    return input.color;
 }

@@ -16,6 +16,7 @@ Renderer::Renderer(HWND handle) : m_vSync(true) {
 	this->createDepthStencil();
 	this->setViewPortAndDepthStencil();
 	this->createViewport();
+	this->createSamplerState();
 
 	//default clear color
 	m_clearColor[0] = 0.0f;
@@ -24,6 +25,8 @@ Renderer::Renderer(HWND handle) : m_vSync(true) {
 	m_clearColor[3] = 1.0f;
 
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
 }
 
 void Renderer::createDeviceAndSwapChain(HWND handle) {
@@ -122,6 +125,17 @@ void Renderer::createDepthStencil() {
 
 	HRUN(m_device->CreateDepthStencilView(depthStencilTexture.Get(), &dsv, &m_stencilView));
 
+}
+
+void Renderer::createSamplerState() {
+	D3D11_SAMPLER_DESC sd = {};
+	sd.Filter   = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	
+	m_device->CreateSamplerState(&sd, &m_samplerState);
+	m_context->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
 }
 
 void Renderer::setViewPortAndDepthStencil() {

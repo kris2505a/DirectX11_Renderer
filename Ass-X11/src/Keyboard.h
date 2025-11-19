@@ -6,10 +6,7 @@ class Keyboard {
 	friend class Input;
 	friend class Window;
 
-//public:
-//	class Event {
-//
-//	};
+
 
 public:
 	Keyboard() = delete;
@@ -21,6 +18,10 @@ public:
 	
 	static void clearState();
 	static bool repeatStatus();
+
+	static bool isKeyDown(int key) {
+		return m_keys[key];
+	}
 	
 private:
 	static void keyPressed(WPARAM key);

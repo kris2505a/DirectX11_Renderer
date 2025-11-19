@@ -22,7 +22,7 @@ private:
 	static void inWindow();
 	static void offWindow();
 
-private:
+public:
 	static bool m_left;
 	static bool m_right;
 	static bool m_middle;
