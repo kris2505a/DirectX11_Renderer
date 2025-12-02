@@ -11,15 +11,9 @@ class Cube : Draws {
 public:
 	Cube();
 	~Cube() = default;
-	unsigned int getIndexCount() const {
-		return p_indexBuffer->getIndexCount();
-	}
-	void bindall() {
-		this->bind();
-	}
-	void unbindall() {
-		this->unbind();
-	}
+	unsigned int getIndexCount() const;
+	void bindall();
+	void unbindall();
 	void update(float deltaTime);
 
 private:

@@ -131,3 +131,13 @@ void Cube::update(float deltaTime) {
 	p_cbo->update(&mat, sizeof(mat));
 	
 }
+
+unsigned int Cube::getIndexCount() const {
+	return p_indexBuffer->getIndexCount();
+}
+void Cube::bindall() {
+	this->bind();
+}
+void Cube::unbindall() {
+	this->unbind();
+}

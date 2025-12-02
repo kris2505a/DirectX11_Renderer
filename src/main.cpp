@@ -2,8 +2,7 @@
 #include "Renderer.h"
 #include "ErrorH.h"
 #include "Cube.h"
-
-#include <chrono>
+#include "Clock.h"
 
 
 int WINAPI WinMain(
@@ -18,6 +17,7 @@ int WINAPI WinMain(
 	renderer->vSync(false);
 
 	renderer->clearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	Clock dtClock;
 
 	Cube cube;
 
@@ -25,16 +25,8 @@ int WINAPI WinMain(
 
 	while (window->isOpen()) {
 		
-		//deltatime
-		auto currentTime = std::chrono::high_resolution_clock::now();
 
-		// Calculate deltaTime in seconds
-		std::chrono::duration<float> elapsed = currentTime - previousTime;
-		float deltaTime = elapsed.count(); // deltaTime in seconds
-
-		// Update previous time
-		previousTime = currentTime;
-
+		float deltaTime = dtClock.elapsed();
 		
 		window->handleMessages();
 		cube.update(deltaTime);
