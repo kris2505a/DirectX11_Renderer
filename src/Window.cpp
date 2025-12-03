@@ -1,13 +1,18 @@
 #include "Window.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include <imgui_impl_win32.h>
 
 #include <windowsx.h>
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);                // Use ImGui::GetCurrentContext()
 
 
 LRESULT CALLBACK Window::messageProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	Window* p_window = nullptr;
+
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+		return true;
 
 	if (msg == WM_NCCREATE) {
 		// get "this" from lpCreateParams
@@ -104,6 +109,8 @@ Window::Window(HINSTANCE instance)
 	this->initWindowHandle();
 	ShowWindow(m_handle, SW_SHOW);
 
+	ImGui_ImplWin32_Init(m_handle);
+
 }
 
 void Window::initWndClassEx() {
@@ -166,4 +173,5 @@ void Window::handleMessages() {
 
 Window::~Window() {
 	DestroyWindow(m_handle);
+	ImGui_ImplWin32_Shutdown();
 }

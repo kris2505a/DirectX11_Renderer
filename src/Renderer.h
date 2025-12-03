@@ -9,7 +9,7 @@ class Renderer {
 	friend class Binds;
 public:
 	Renderer(HWND handle);
-	~Renderer() = default;
+	~Renderer();
 	void wipeOff();
 	void flipBuffers();
 	void clearColor(float r, float g, float b, float a);

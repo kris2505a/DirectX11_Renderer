@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "ErrorH.h"
 #include <print>
+#include <imgui_impl_dx11.h>
 
 Renderer* Renderer::s_instance = nullptr;
 
@@ -26,7 +27,7 @@ Renderer::Renderer(HWND handle) : m_vSync(true) {
 
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-
+	ImGui_ImplDX11_Init(m_device.Get(), m_context.Get());
 }
 
 void Renderer::createDeviceAndSwapChain(HWND handle) {
@@ -164,4 +165,8 @@ void Renderer::vSync(bool condition) {
 
 void Renderer::indexedRender(int size) {
 	RUN(m_context->DrawIndexed(size, 0, 0), m_device);
+}
+
+Renderer::~Renderer() {
+	ImGui_ImplDX11_Shutdown();
 }
