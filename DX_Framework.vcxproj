@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\Binds.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\Cube.cpp" />
     <ClCompile Include="src\Draws.cpp" />

@@ -79,11 +79,7 @@ Cube::Cube() {
 		DirectX::XMMatrixTranslation(position.x, position.y, position.z) *
 		DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
 
-	auto view = DirectX::XMMatrixLookAtLH(
-		{ 0.0f, 0.0f, -3.0f, 1.0f },
-		{ 0.0f, 0.0f, 0.0f, 0.0f},
-		{ 0.0f, 1.0f, 0.0f, 1.0f}
-	);
+	auto view = m_camera.getView();
 
 	auto projection = DirectX::XMMatrixPerspectiveFovLH(45.0f, 16.0f / 9.0f, 0.5f, 10.0f);
 
@@ -119,11 +115,7 @@ void Cube::update(float deltaTime) {
 		DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z) *
 		DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
-	auto view = DirectX::XMMatrixLookAtLH(
-		{ 0.0f, 0.0f, -3.0f, 1.0f },
-		{ 0.0f, 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f, 1.0f }
-	);
+	auto view = m_camera.getView();
 
 	auto projection = DirectX::XMMatrixPerspectiveFovLH(degToRad(45.0f), 16.0f / 9.0f, 0.5f, 10.0f);
 

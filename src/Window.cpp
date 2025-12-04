@@ -109,7 +109,6 @@ Window::Window(HINSTANCE instance)
 	this->initWindowHandle();
 	ShowWindow(m_handle, SW_SHOW);
 
-	ImGui_ImplWin32_Init(m_handle);
 
 }
 

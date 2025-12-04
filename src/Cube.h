@@ -2,6 +2,7 @@
 #include "Draws.h"
 #include "ConstantBuffer.h"
 #include <DirectXMath.h>
+#include "Camera.h"
 
 struct Vector {
 	float x, y, z;
@@ -20,5 +21,6 @@ private:
 	ConstantBuffer* p_cbo = nullptr;
 	DirectX::XMMATRIX mat;
 	Vector position, rotation, scale;
-	
+	Camera m_camera;
+
 };

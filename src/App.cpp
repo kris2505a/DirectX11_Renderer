@@ -3,6 +3,8 @@
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 
+#include "Cube.h"
+
 App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
 
 	//ImGui
@@ -17,20 +19,26 @@ App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
 	m_window = std::make_unique <Window>(instance);
 	m_renderer = std::make_unique <Renderer>(m_window->getHandle());
 
+	ImGui_ImplWin32_Init(m_window->getHandle());
+
+
 	m_renderer->clearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void App::run() {
+
+	Cube cube;
 	
 	while (m_window->isOpen()) {
 		this->update();
 		this->imguiRender();
-
-		ImGui::Begin("TestWindow");
-		ImGui::Text("big butt");
-		ImGui::End();
-
+		cube.update(m_deltaTime);
 		this->render();
+		cube.bindall();
+		m_renderer->indexedRender(cube.getIndexCount());
+		cube.unbindall();
+		m_renderer->flipBuffers();
+
 	}
 }
 
@@ -43,11 +51,11 @@ void App::render() {
 	m_renderer->wipeOff();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	m_renderer->flipBuffers();
 }
 
 void App::imguiRender() {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	
 }
