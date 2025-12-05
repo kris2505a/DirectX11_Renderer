@@ -94,7 +94,8 @@ Cube::Cube() {
 
 void Cube::update(float deltaTime) {
 
-	float speed = 2.0f;
+	m_camera.update(deltaTime);
+;	float speed = 2.0f;
 
 	if (Keyboard::isKeyDown(KEY_A)) {
 		rotation.y += speed * deltaTime;
