@@ -1,8 +1,9 @@
 #include "Camera.h"
 #include "imgui.h"
+#include "Mouse.h"
 
 Camera::Camera()
-	: m_zoom(-5.0f), m_pitch(0.0f), m_yaw(0.0f) {
+	: m_zoom(-5.0f), m_pitch(0.0f), m_yaw(0.0f), m_sensitivity(1.0f) {
 
 	float x = m_zoom * cosf(m_pitch) * sinf(m_yaw);
 	float y = m_zoom * sinf(m_pitch);
@@ -20,12 +21,17 @@ Camera::Camera()
 void Camera::update(float deltaTime) {
 
 
+	float dx = (Mouse::m_xPos / 1600.0f) * 2.0f - 1.0f;
+	float dy = 1.0f - (Mouse::m_yPos / 900.0f) * 2.0f;
+
 	ImGui::Begin("Camera");
+	ImGui::SliderFloat("Sensitivity", &m_sensitivity, 0.1f, 3.0f);
 	ImGui::SliderFloat("Distance", &m_zoom, -1.0f, -20.0f);
-	ImGui::SliderFloat("Pitch", &m_pitch, -dx::XM_PIDIV2 + 0.01f, dx::XM_PIDIV2 - 0.01f);
-	ImGui::SliderFloat("Yaw", &m_yaw, -dx::XM_PI, dx::XM_PI);
+	ImGui::Text("Mouse: %f, %f", dx, dy);
 	ImGui::End();
 	
+	m_yaw = dx * m_sensitivity;
+	m_pitch = dy * m_sensitivity;
 
 	float x = m_zoom * cosf(m_pitch) * sinf(m_yaw);
 	float y = m_zoom * sinf(m_pitch);

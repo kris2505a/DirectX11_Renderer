@@ -21,5 +21,6 @@ private:
 	float m_zoom;
 	float m_pitch;
 	float m_yaw;
+	float m_sensitivity;
 
 };
