@@ -7,14 +7,19 @@ class Camera {
 public:
 	Camera();
 	~Camera() = default;
-
 	void update(float deltaTime);
-	dx::XMMATRIX& getView();
+	dx::XMMATRIX& view();
+	dx::XMMATRIX& projection();
+
 
 private:
 	dx::XMMATRIX m_view;
-	dx::XMVECTOR m_forward, m_right, m_up, m_world, m_position;
-	float m_pitch, m_yaw;
-	float m_speed;
+	dx::XMMATRIX m_projection;
+
+	dx::XMVECTOR m_eye, m_target, m_up;
+	
 	float m_zoom;
+	float m_pitch;
+	float m_yaw;
+
 };

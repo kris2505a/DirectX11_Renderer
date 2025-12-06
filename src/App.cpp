@@ -27,16 +27,25 @@ App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
 
 void App::run() {
 
-	Cube cube;
+	Camera camera;
+	Cube cube(&camera, -0.7f, 0.5f, 0.0f);
+	Cube cube2(&camera, 1.0f, -0.5f, 0.0f);
 	
 	while (m_window->isOpen()) {
 		this->update();
 		this->imguiRender();
+		camera.update(m_deltaTime);
 		cube.update(m_deltaTime);
+		cube2.update(m_deltaTime);
 		this->render();
-		cube.bindall();
+		cube.bind();
 		m_renderer->indexedRender(cube.getIndexCount());
-		cube.unbindall();
+		cube.unbind();
+
+		cube2.bind();
+		m_renderer->indexedRender(cube2.getIndexCount());
+		cube2.unbind();
+
 		m_renderer->flipBuffers();
 
 	}

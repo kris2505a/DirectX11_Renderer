@@ -144,7 +144,6 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\Cube.cpp" />
-    <ClCompile Include="src\Draws.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\InputLayout.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
@@ -171,7 +170,6 @@
     <ClInclude Include="src\Clock.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\Cube.h" />
-    <ClInclude Include="src\Draws.h" />
     <ClInclude Include="src\ErrorH.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\InputLayout.h" />

@@ -1,6 +1,9 @@
 #pragma once
-#include "Draws.h"
 #include "ConstantBuffer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "Shader.h"
+#include "InputLayout.h"
 #include <DirectXMath.h>
 #include "Camera.h"
 
@@ -8,19 +11,24 @@ struct Vector {
 	float x, y, z;
 };
 
-class Cube : Draws {
+class Cube {
 public:
-	Cube();
-	~Cube() = default;
+	Cube(Camera* curCamera, float x, float y, float z);
+	~Cube();
 	unsigned int getIndexCount() const;
-	void bindall();
-	void unbindall();
+	void bind();
+	void unbind();
 	void update(float deltaTime);
 
 private:
-	ConstantBuffer* p_cbo = nullptr;
+	ConstantBuffer* cbo = nullptr;
+	VertexBuffer* vbo = nullptr;
+	IndexBuffer* ibo = nullptr;
+	InputLayout* ilo = nullptr;
+	Shader* shader = nullptr;
+
 	DirectX::XMMATRIX mat;
 	Vector position, rotation, scale;
-	Camera m_camera;
+	Camera* p_camera;
 
 };
