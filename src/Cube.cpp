@@ -90,7 +90,8 @@ Cube::Cube(Camera* camera, float x, float y, float z) : p_camera(camera) {
 
 void Cube::update(float deltaTime) {
 
-;	float speed = 2.0f;
+	/*
+	float speed = 2.0f;
 
 	if (Keyboard::isKeyDown(KEY_A)) {
 		rotation.y -= speed * deltaTime;
@@ -104,6 +105,7 @@ void Cube::update(float deltaTime) {
 	if (Keyboard::isKeyDown(KEY_W)) {
 		rotation.x -= speed * deltaTime;
 	}
+	*/
 
 	auto model = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) *
 		DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z) *

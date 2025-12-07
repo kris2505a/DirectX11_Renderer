@@ -109,7 +109,18 @@ Window::Window(HINSTANCE instance)
 	this->initWindowHandle();
 	ShowWindow(m_handle, SW_SHOW);
 
+	RECT rc;
+	GetClientRect(m_handle, &rc);
 
+	POINT center;
+	center.x = (rc.right - rc.left) / 2;
+	center.y = (rc.bottom - rc.top) / 2;
+
+	POINT screenCenter = center;
+
+	ClientToScreen(m_handle, &screenCenter);
+
+	SetCursorPos(screenCenter.x, screenCenter.y);
 }
 
 void Window::initWndClassEx() {

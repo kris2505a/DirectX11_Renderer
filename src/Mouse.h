@@ -29,5 +29,8 @@ public:
 	static bool m_inWindow;
 	static int m_xPos;
 	static int m_yPos;
+	static float m_deltaX;
+	static float m_deltaY;
 	static int m_wheel;
+	static bool m_firstMove;
 };

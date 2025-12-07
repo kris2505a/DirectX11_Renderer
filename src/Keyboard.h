@@ -2,6 +2,13 @@
 #include <bitset>
 #include <Windows.h>
 
+#define kW 0x57 
+#define kA 0x41
+#define kS 0x53
+#define kD 0x44
+#define kQ 0x51
+#define kE 0x45
+
 class Keyboard {
 	friend class Input;
 	friend class Window;
