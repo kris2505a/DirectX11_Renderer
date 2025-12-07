@@ -18,7 +18,7 @@ App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
 
 	m_window = std::make_unique <Window>(instance);
 	m_renderer = std::make_unique <Renderer>(m_window->getHandle());
-	m_renderer->vSync(true);
+	m_renderer->vSync(false);
 
 	ImGui_ImplWin32_Init(m_window->getHandle());
 

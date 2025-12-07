@@ -104,4 +104,9 @@ void Mouse::offWindow() {
 
 void Mouse::lockMouse(bool condition) {
 	m_locked = condition;
+	if (m_locked)
+		ShowCursor(FALSE);
+	else
+		ShowCursor(TRUE);
 }
+
