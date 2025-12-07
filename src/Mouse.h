@@ -11,6 +11,9 @@ public:
 	Mouse& operator=(const Mouse&) = delete;
 	Mouse(Mouse&&) = delete;
 	Mouse& operator=(Mouse&&) = delete;
+
+	static void lockMouse(bool condition);
+
 	
 //functions accessible using window.cpp
 private:
@@ -21,6 +24,7 @@ private:
 	static bool isInWindow();
 	static void inWindow();
 	static void offWindow();
+	
 
 public:
 	static bool m_left;
@@ -33,4 +37,6 @@ public:
 	static float m_deltaY;
 	static int m_wheel;
 	static bool m_firstMove;
+	static bool m_locked;
+	static bool m_ignoreMove;
 };

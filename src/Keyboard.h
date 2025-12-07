@@ -8,6 +8,7 @@
 #define kD 0x44
 #define kQ 0x51
 #define kE 0x45
+#define TILDE 0x60
 
 class Keyboard {
 	friend class Input;

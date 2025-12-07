@@ -6,9 +6,13 @@ bool Mouse::m_right      = false;
 bool Mouse::m_middle     = false;
 bool Mouse::m_inWindow   = false;
 bool Mouse::m_firstMove  = true;
+bool Mouse::m_locked	 = false;
+bool Mouse::m_ignoreMove = false;
+
 int  Mouse::m_xPos       = 0;
 int  Mouse::m_yPos       = 0;
 int  Mouse::m_wheel      = 0;
+
 float Mouse::m_deltaX	 = 0.0f;
 float Mouse::m_deltaY    = 0.0f;
 
@@ -52,9 +56,23 @@ void Mouse::move(int x, int y) {
 	m_xPos = x;
 	m_yPos = y;
 
+	if (m_ignoreMove) {
+		m_ignoreMove = false;
+		m_deltaX = 0.0f;
+		m_deltaY = 0.0f;
+		return;
+	}
+
 	m_deltaX = static_cast <float> (m_xPos) - prevX;
 	m_deltaY = static_cast <float> (m_yPos) - prevY;
 	
+	if (m_locked) {
+		SetCursorPos(1920 / 2, 1080 / 2);
+		m_xPos = 1920 / 2;
+		m_yPos = 1080 / 2;
+		m_ignoreMove = true;
+	}
+
 	if (m_firstMove) {
 		m_deltaX = 0.0f;
 		m_deltaY = 0.0f;
@@ -82,4 +100,8 @@ void Mouse::inWindow() {
 
 void Mouse::offWindow() {
 	m_inWindow = false;
+}
+
+void Mouse::lockMouse(bool condition) {
+	m_locked = condition;
 }

@@ -25,10 +25,15 @@ Camera::Camera()
 	m_view = dx::XMMatrixLookAtLH(m_position, dx::XMVectorZero(), m_up);
 	m_projection = dx::XMMatrixPerspectiveFovLH(dx::XMConvertToRadians(45.0f), 16.0f / 9.0f, 0.5f, 20.0f);
 
+	Mouse::lockMouse(true);
 
 }
 
 void Camera::update(float deltaTime) {
+
+	if (Keyboard::isKeyDown(kQ)) {
+		Mouse::m_locked = !Mouse::m_locked;
+	}
 
 	float dx = Mouse::m_deltaX;
 	float dy = Mouse::m_deltaY;
