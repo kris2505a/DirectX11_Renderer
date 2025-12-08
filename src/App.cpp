@@ -15,13 +15,10 @@ App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
 
 	ImGui::StyleColorsDark();
 
-
 	m_window = std::make_unique <Window>(instance);
 	m_renderer = std::make_unique <Renderer>(m_window->getHandle());
-	m_renderer->vSync(false);
 
 	ImGui_ImplWin32_Init(m_window->getHandle());
-
 
 	m_renderer->clearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
@@ -48,7 +45,6 @@ void App::run() {
 		cube2.unbind();
 
 		m_renderer->flipBuffers();
-
 	}
 }
 
