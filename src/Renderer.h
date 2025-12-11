@@ -7,6 +7,8 @@ namespace wrl = Microsoft::WRL;
 
 class Renderer {
 	friend class Binds;
+	friend class App;
+
 public:
 	Renderer(HWND handle);
 	~Renderer();

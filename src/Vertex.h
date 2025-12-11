@@ -2,5 +2,5 @@
 
 struct Vertex {
 	DirectX::XMFLOAT3 xyz;
-	DirectX::XMFLOAT4 rgba;
+	DirectX::XMFLOAT2 uv;
 };

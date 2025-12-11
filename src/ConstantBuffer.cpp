@@ -9,7 +9,7 @@ ConstantBuffer::ConstantBuffer(const void* data, int size, ShaderType type)
 	cbd.Usage = D3D11_USAGE_DYNAMIC;
 	cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	cbd.MiscFlags = 0;
-	cbd.ByteWidth = size;
+	cbd.ByteWidth = (size + 15) & ~15;
 	cbd.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA crd;

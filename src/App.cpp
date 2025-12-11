@@ -4,6 +4,7 @@
 #include <imgui_impl_win32.h>
 
 #include "Cube.h"
+#include "CubeMeshed.h"
 
 App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
 
@@ -26,23 +27,24 @@ App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
 void App::run() {
 
 	Camera camera;
-	Cube cube(&camera, -0.7f, 0.5f, 0.0f);
-	Cube cube2(&camera, 1.0f, -0.5f, 0.0f);
 	
+	auto cubeMesh = Mesh::cubeMesh();
+	auto material = Material::createMaterial();
+
+	CubeMeshed cube1(cubeMesh, material, &camera);
+	cube1.setColor(1.0f, 0.0f, 1.0f);
+
+	CubeMeshed cube2(cubeMesh, material, &camera);
+	cube2.setColor(0.0f, 1.0f, 0.0f);
+
 	while (m_window->isOpen()) {
 		this->update();
 		this->imguiRender();
 		camera.update(m_deltaTime);
-		cube.update(m_deltaTime);
-		cube2.update(m_deltaTime);
+		cube1.update(m_deltaTime);
 		this->render();
-		cube.bind();
-		m_renderer->indexedRender(cube.getIndexCount());
-		cube.unbind();
 
-		cube2.bind();
-		m_renderer->indexedRender(cube2.getIndexCount());
-		cube2.unbind();
+		cube1.render(m_renderer->m_context.Get());
 
 		m_renderer->flipBuffers();
 	}
