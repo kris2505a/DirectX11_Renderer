@@ -27,4 +27,8 @@ private:
 	ConstantBuffer* m_vcbo;
 	ConstantBuffer* m_pcbo;
 	dx::XMFLOAT4 m_color;
+	std::string m_name;
+
+private:
+	static int s_cubeId;
 };

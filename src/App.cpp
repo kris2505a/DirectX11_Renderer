@@ -38,14 +38,31 @@ void App::run() {
 	cube2.setColor(0.0f, 1.0f, 0.0f);
 
 	while (m_window->isOpen()) {
+		
+		//deltatime and message handling
 		this->update();
-		this->imguiRender();
+
+		//imgui init
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		//updating
 		camera.update(m_deltaTime);
 		cube1.update(m_deltaTime);
+		cube2.update(m_deltaTime);
+
+		//rendering
 		this->render();
-
 		cube1.render(m_renderer->m_context.Get());
+		cube2.render(m_renderer->m_context.Get());
 
+		//imgui render
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+
+		//swap buffers
 		m_renderer->flipBuffers();
 	}
 }
@@ -57,8 +74,6 @@ void App::update() {
 
 void App::render() {
 	m_renderer->wipeOff();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
 void App::imguiRender() {

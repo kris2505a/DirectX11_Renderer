@@ -1,4 +1,7 @@
 #include "CubeMeshed.h"
+#include <imgui.h>
+
+int CubeMeshed::s_cubeId = 0;
 
 CubeMeshed::CubeMeshed(Mesh* mesh, Material* mat, Camera* cam)
 	: p_mesh(mesh), p_material(mat), p_camera(cam), m_transform(nullptr) {
@@ -11,6 +14,8 @@ CubeMeshed::CubeMeshed(Mesh* mesh, Material* mat, Camera* cam)
 	m_color = { 0.0f, 1.0f, 1.0f, 1.0f };
 	m_pcbo = new ConstantBuffer(&m_color, sizeof(m_color), ShaderType::pixelShader);
 
+	s_cubeId++;
+	m_name = "Cube: " + std::to_string(s_cubeId);
 }
 
 CubeMeshed::~CubeMeshed() {
@@ -22,10 +27,19 @@ CubeMeshed::~CubeMeshed() {
 void CubeMeshed::update(float deltaTime) {
 	m_transform->update();
 	auto matr = dx::XMMatrixTranspose(m_transform->m_model * p_camera->view() * p_camera->projection());
-	m_vcbo->update(&matr, sizeof(m_transform->m_model));
+	m_vcbo->update(&matr, sizeof(matr));
 }
 
 void CubeMeshed::render(ID3D11DeviceContext* context) {
+
+	ImGui::Begin(m_name.c_str());
+	
+	ImGui::InputFloat("X", &m_transform->m_position.x);
+	ImGui::InputFloat("Y", &m_transform->m_position.y);
+	ImGui::InputFloat("Z", &m_transform->m_position.z);
+
+	ImGui::End();
+
 	p_mesh->m_vbo->bind();
 	p_mesh->m_ibo->bind();
 	p_material->m_ilo->bind();
