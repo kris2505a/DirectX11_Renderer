@@ -110,15 +110,22 @@ void Renderer::createViewport() {
 
 void Renderer::createDepthStencil() {
 
-	DXGI_SWAP_CHAIN_DESC swapDesc = {};
-	m_swapchain->GetDesc(&swapDesc);
+	D3D11_DEPTH_STENCIL_DESC dsd = {};
+	dsd.DepthEnable = true;
+	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsd.DepthFunc = D3D11_COMPARISON_LESS;
+	dsd.StencilEnable = false;
+
+	HRUN(m_device->CreateDepthStencilState(&dsd, &m_stencilState));
+	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 1), m_device.Get());
 
 	D3D11_TEXTURE2D_DESC t2d = { 0 };
 	t2d.Width = 1600;
 	t2d.Height = 900;
 	t2d.MipLevels = 1;
 	t2d.ArraySize = 1;
-	t2d.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	//t2d.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	t2d.Format = DXGI_FORMAT_D32_FLOAT;
 	t2d.SampleDesc.Count = 1;
 	t2d.SampleDesc.Quality = 0;
 	t2d.Usage = D3D11_USAGE_DEFAULT;
@@ -129,18 +136,11 @@ void Renderer::createDepthStencil() {
 	wrl::ComPtr <ID3D11Texture2D> depthStencilTexture;
 	HRUN(m_device->CreateTexture2D(&t2d, nullptr, &depthStencilTexture));
 
-	D3D11_DEPTH_STENCIL_DESC dsd = {};
-	dsd.DepthEnable = true;
-	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsd.DepthFunc = D3D11_COMPARISON_LESS;
-	dsd.StencilEnable = false;
 
-	HRUN(m_device->CreateDepthStencilState(&dsd, &m_stencilState));
-	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 0), m_device.Get());
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsv = {};
-	dsv.Format = t2d.Format;
 	dsv.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsv.Format = DXGI_FORMAT_D32_FLOAT;
 	dsv.Texture2D.MipSlice = 0;
 
 	HRUN(m_device->CreateDepthStencilView(depthStencilTexture.Get(), &dsv, &m_stencilView));	
@@ -173,8 +173,9 @@ void Renderer::setViewPortAndDepthStencil() {
 }
 
 void Renderer::wipeOff() {
-	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 0), m_device.Get());
+	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 1), m_device.Get());
 	RUN(m_context->OMSetRenderTargets(1, m_targetView.GetAddressOf(), m_stencilView.Get()), m_device);
+	m_context->RSSetState(m_rasterizerState.Get());
 
 
 	RUN(m_context->ClearRenderTargetView(m_targetView.Get(), m_clearColor), m_device);

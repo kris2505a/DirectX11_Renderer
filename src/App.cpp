@@ -54,8 +54,8 @@ void App::run() {
 
 		//rendering
 		this->render();
-		cube1.render(m_renderer->m_context.Get());
 		cube2.render(m_renderer->m_context.Get());
+		cube1.render(m_renderer->m_context.Get());
 
 		//imgui render
 		ImGui::Render();
