@@ -29,11 +29,18 @@ Renderer::Renderer(HWND handle) : m_vSync(true) {
 	this->createSamplerState();
 	this->createRasterizer();
 
+	m_blendFactor[0] = 0.0f;
+	m_blendFactor[1] = 0.0f;
+	m_blendFactor[2] = 0.0f;
+	m_blendFactor[3] = 0.0f;
+
 	//default clear color
 	m_clearColor[0] = 0.0f;
 	m_clearColor[1] = 0.0f;
 	m_clearColor[2] = 0.0f;
 	m_clearColor[3] = 1.0f;
+
+	this->createBlendState();
 
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -168,18 +175,40 @@ void Renderer::createRasterizer() {
 	RUN(m_context->RSSetState(m_rasterizerState.Get()), m_device.Get());
 }
 
+void Renderer::createBlendState() {
+	D3D11_BLEND_DESC bd = {};
+
+	bd.AlphaToCoverageEnable = false;
+	bd.IndependentBlendEnable = false;
+
+	bd.RenderTarget[0].BlendEnable = false;
+	bd.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	bd.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+	bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+
+	bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	HRUN(m_device->CreateBlendState(&bd, &m_blendState));
+	RUN(m_context->OMSetBlendState(m_blendState.Get(), m_blendFactor, 0xFFFFFFFF), m_device.Get());
+}
+
 void Renderer::setViewPortAndDepthStencil() {
 	RUN(m_context->OMSetRenderTargets(1, m_targetView.GetAddressOf(), m_stencilView.Get()), m_device);
 }
 
 void Renderer::wipeOff() {
-	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 1), m_device.Get());
+	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 0), m_device.Get());
 	RUN(m_context->OMSetRenderTargets(1, m_targetView.GetAddressOf(), m_stencilView.Get()), m_device);
-	m_context->RSSetState(m_rasterizerState.Get());
+	RUN(m_context->OMSetBlendState(m_blendState.Get(), m_blendFactor, 0xFFFFFFFF), m_device.Get());
+	RUN(m_context->RSSetState(m_rasterizerState.Get()), m_device.Get());
 
 
 	RUN(m_context->ClearRenderTargetView(m_targetView.Get(), m_clearColor), m_device);
-	RUN(m_context->ClearDepthStencilView(m_stencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0), m_device);
+	RUN(m_context->ClearDepthStencilView(m_stencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0), m_device);
 }
 
 void Renderer::flipBuffers() {

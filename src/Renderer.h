@@ -3,6 +3,7 @@
 #include <wrl/client.h>
 #include <DirectXMath.h>
 
+
 namespace wrl = Microsoft::WRL;
 
 class Renderer {
@@ -26,6 +27,7 @@ private:
 	void setViewPortAndDepthStencil();
 	void createSamplerState();
 	void createRasterizer();
+	void createBlendState();
 
 private:
 	wrl::ComPtr <ID3D11Device> m_device;
@@ -36,10 +38,13 @@ private:
 	wrl::ComPtr <ID3D11DepthStencilState> m_stencilState;
 	wrl::ComPtr <ID3D11SamplerState> m_samplerState;
 	wrl::ComPtr <ID3D11RasterizerState> m_rasterizerState;
+	wrl::ComPtr <ID3D11BlendState> m_blendState;
 
 	float m_clearColor[4];
+	float m_blendFactor[4];
 
 	DirectX::XMMATRIX m_view, m_projection;
+
 
 private:
 	static Renderer* s_instance;

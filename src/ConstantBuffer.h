@@ -4,7 +4,7 @@
 
 class ConstantBuffer : public Binds {
 public:
-	ConstantBuffer(const void* data, int size, ShaderType type);
+	ConstantBuffer(const void* data, int size, ShaderType type, int slot = 0);
 	~ConstantBuffer() = default;
 
 	void bind() const final override;
@@ -14,4 +14,5 @@ public:
 private:
 	ShaderType m_type;
 	Microsoft::WRL::ComPtr <ID3D11Buffer> m_buffer;
+	int m_slot;
 };

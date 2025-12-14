@@ -1,8 +1,8 @@
 #include "ConstantBuffer.h"
 #include "ErrorH.h"
 
-ConstantBuffer::ConstantBuffer(const void* data, int size, ShaderType type)
-	: m_type(type) {
+ConstantBuffer::ConstantBuffer(const void* data, int size, ShaderType type, int slot)
+	: m_type(type), m_slot(slot) {
 	
 	D3D11_BUFFER_DESC cbd;
 	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -21,10 +21,10 @@ ConstantBuffer::ConstantBuffer(const void* data, int size, ShaderType type)
 
 void ConstantBuffer::bind() const {
 	if (m_type == ShaderType::vertexShader) {
-		RUN(context()->VSSetConstantBuffers(0, 1, m_buffer.GetAddressOf()), device());
+		RUN(context()->VSSetConstantBuffers(m_slot, 1, m_buffer.GetAddressOf()), device());
 	}
 	else if (m_type == ShaderType::pixelShader) {
-		RUN(context()->PSSetConstantBuffers(0, 1, m_buffer.GetAddressOf()), device());
+		RUN(context()->PSSetConstantBuffers(m_slot, 1, m_buffer.GetAddressOf()), device());
 	}
 }
 

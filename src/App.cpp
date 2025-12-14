@@ -3,10 +3,22 @@
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 
-#include "Cube.h"
 #include "CubeMeshed.h"
 
+struct DLight {
+	dx::XMFLOAT3 direction;
+	float intensity;
+	dx::XMFLOAT3 color;
+	float padding;
+};
+
 App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
+
+	DLight light;
+	light.direction = { -0.3f, -1.0f, -0.2f };
+	light.intensity = 1.0f;
+	light.color = { 1.0f, 1.0f, 0.0f };
+
 
 	//ImGui
 	IMGUI_CHECKVERSION();
@@ -22,6 +34,9 @@ App::App(HINSTANCE instance) : m_deltaTime(0.0f) {
 	ImGui_ImplWin32_Init(m_window->getHandle());
 
 	m_renderer->clearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	lightBuffer = new ConstantBuffer(&light, sizeof(light), ShaderType::pixelShader, 1);
+
 }
 
 void App::run() {
@@ -31,10 +46,10 @@ void App::run() {
 	auto cubeMesh = Mesh::cubeMesh();
 	auto material = Material::createMaterial();
 
-	CubeMeshed cube1(cubeMesh, material, &camera);
+	CubeMeshed cube1(cubeMesh, material, &camera, lightBuffer);
 	cube1.setColor(1.0f, 0.0f, 1.0f);
 
-	CubeMeshed cube2(cubeMesh, material, &camera);
+	CubeMeshed cube2(cubeMesh, material, &camera, lightBuffer);
 	cube2.setColor(0.0f, 1.0f, 0.0f);
 
 	while (m_window->isOpen()) {
@@ -79,6 +94,9 @@ void App::render() {
 void App::imguiRender() {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	
+	ImGui::NewFrame();	
+}
+
+App::~App() {
+	delete lightBuffer;
 }

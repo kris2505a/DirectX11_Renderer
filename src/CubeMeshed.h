@@ -7,7 +7,7 @@
 class CubeMeshed {
 
 public:
-	CubeMeshed(Mesh* mesh, Material* mat, Camera* cam);
+	CubeMeshed(Mesh* mesh, Material* mat, Camera* cam, ConstantBuffer* light);
 	~CubeMeshed();
 	void setColor(float r, float g, float b) {
 		m_color.x = r;
@@ -26,6 +26,8 @@ private:
 	Camera* p_camera;
 	ConstantBuffer* m_vcbo;
 	ConstantBuffer* m_pcbo;
+	ConstantBuffer* m_trbo;
+	ConstantBuffer* p_light;
 	dx::XMFLOAT4 m_color;
 	std::string m_name;
 

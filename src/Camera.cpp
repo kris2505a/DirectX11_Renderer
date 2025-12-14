@@ -23,7 +23,7 @@ Camera::Camera()
 	m_up = dx::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	m_view = dx::XMMatrixLookAtLH(m_position, dx::XMVectorZero(), m_up);
-	m_projection = dx::XMMatrixPerspectiveFovLH(dx::XMConvertToRadians(45.0f), 16.0f / 9.0f, 0.01f, 100.0f);
+	m_projection = dx::XMMatrixPerspectiveFovLH(dx::XM_PIDIV4, 16.0f / 9.0f, 0.01f, 100.0f);
 
 
 }
@@ -42,9 +42,10 @@ void Camera::update(float deltaTime) {
 	ImGui::Text("Mouse: %f, %f", dx, dy);
 	ImGui::End();
 	
-	m_yaw += dx * m_sensitivity;
-	m_pitch -= dy * m_sensitivity;
-
+	if (Keyboard::isKeyDown(VK_CONTROL) || Mouse::m_locked) {
+		m_yaw += dx * m_sensitivity;
+		m_pitch -= dy * m_sensitivity;
+	}
 
 
 	m_pitch = std::clamp(m_pitch, -dx::XM_PIDIV2 + 0.01f, dx::XM_PIDIV2 - 0.01f);
