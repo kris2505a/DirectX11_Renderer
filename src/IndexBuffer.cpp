@@ -1,33 +1,27 @@
-#include "IndexBuffer.h"
-#include "ErrorH.h"
+#include "IndexBuffer.hpp"
+#include <cstdint>
+#include "Error.hpp"
 
-IndexBuffer::IndexBuffer(const void* data, int size, unsigned int count, unsigned int offset) 
-	: m_count(count), m_offset(offset){
-	D3D11_BUFFER_DESC ibd = {};
-	ibd.Usage = D3D11_USAGE_DYNAMIC;
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	ibd.MiscFlags = 0;
-	ibd.ByteWidth = size;
-	ibd.StructureByteStride = sizeof(unsigned int);
+IndexBuffer::IndexBuffer(const void* indices, unsigned int count, unsigned int offset) 
+    : m_offset(offset), m_count(count) {
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bd.CPUAccessFlags = 0;
+	bd.MiscFlags = 0;
+	bd.ByteWidth = count * sizeof(uint32_t);
+	bd.StructureByteStride = sizeof(uint32_t);
 
-	D3D11_SUBRESOURCE_DATA isd = {};
-	isd.pSysMem = data;
+	D3D11_SUBRESOURCE_DATA srd = {};
+	srd.pSysMem = indices;
 
-	HRUN(device()->CreateBuffer(&ibd, &isd, &m_buffer));
+	HRUN(device()->CreateBuffer(&bd, &srd, &m_buffer));
 }
 
 void IndexBuffer::bind() const {
-	RUN(context()->IASetIndexBuffer(m_buffer.Get(), DXGI_FORMAT_R32_UINT, 0), device());
+	RUN(context()->IASetIndexBuffer(m_buffer.Get(), DXGI_FORMAT_R32_UINT, m_offset), device());
 }
 
-void IndexBuffer::unbind() const {
-	ID3D11Buffer* nullBuffer = nullptr;
-	UINT stride = 0;
-	UINT offset = 0;
-	context()->IASetIndexBuffer(nullBuffer, DXGI_FORMAT_UNKNOWN, offset);
-}
-
-unsigned int IndexBuffer::getIndexCount() const {
+unsigned int IndexBuffer::indexCount() const {
 	return m_count;
 }

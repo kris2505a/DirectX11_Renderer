@@ -1,76 +1,52 @@
-////////////////////////////////
-////// Note For Viewers ////////
-////////////////////////////////
-/*
-	If you guys can't understand anything here or hard to follow. Its ok
-	It's not you. It the MothaFukin' DirectX11
-
-*/
-
-#include "Renderer.h"
-#include "ErrorH.h"
-#include <print>
-#include <imgui_impl_dx11.h>
+#include "Renderer.hpp"
+#include "Error.hpp"
 
 Renderer* Renderer::s_instance = nullptr;
 
-Renderer::Renderer(HWND handle) : m_vSync(true) {
+Renderer::Renderer(HWND handle) {
+	p_handle = handle;
+	m_renderWidth = 1600;
+	m_renderHeight = 900;
+	m_clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+	m_viewPort = {};
 
-	if (s_instance) {
-		std::println("Instance of Renderer already exists!");
-		std::abort();
+	if(!s_instance) {
+		s_instance = this;
 	}
-	s_instance = this;
-	this->createDeviceAndSwapChain(handle);
-	this->createRenderTargetView();
-	this->createDepthStencil();
-	this->setViewPortAndDepthStencil();
-	this->createViewport();
-	this->createSamplerState();
-	this->createRasterizer();
 
-	m_blendFactor[0] = 0.0f;
-	m_blendFactor[1] = 0.0f;
-	m_blendFactor[2] = 0.0f;
-	m_blendFactor[3] = 0.0f;
+	createDeviceSwapChain();
+	createRenderTargetView();
+	createDepthStencilState();
+	createDepthStencilView();
+	createViewPort();
 
-	//default clear color
-	m_clearColor[0] = 0.0f;
-	m_clearColor[1] = 0.0f;
-	m_clearColor[2] = 0.0f;
-	m_clearColor[3] = 1.0f;
-
-	this->createBlendState();
-
-	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	ImGui_ImplDX11_Init(m_device.Get(), m_context.Get());
+	preRender();
 }
 
-void Renderer::createDeviceAndSwapChain(HWND handle) {
-	DXGI_SWAP_CHAIN_DESC sd = { 0 };
-	sd.BufferDesc.Width = 1600;
-	sd.BufferDesc.Height = 900;
-	sd.BufferDesc.RefreshRate.Numerator = 0;
-	sd.BufferDesc.RefreshRate.Denominator = 0;
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+void Renderer::createDeviceSwapChain() {
+	DXGI_SWAP_CHAIN_DESC sd                 = {};
+	sd.BufferDesc.Width                     = 0;
+	sd.BufferDesc.Height                    = 0;
+	sd.BufferDesc.RefreshRate.Numerator     = 0;
+	sd.BufferDesc.RefreshRate.Denominator   = 0;
+	sd.BufferDesc.Format                    = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sd.BufferDesc.ScanlineOrdering          = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
+	sd.BufferDesc.Scaling                   = DXGI_MODE_SCALING_UNSPECIFIED;
+	sd.SampleDesc.Count                     = 1;
+	sd.SampleDesc.Quality                   = 0;
+	sd.BufferCount                          = 1;
+	sd.OutputWindow                         = p_handle;
+	sd.BufferUsage                          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	sd.Windowed                             = true;
+	sd.SwapEffect                           = DXGI_SWAP_EFFECT_DISCARD;
 
-	sd.SampleDesc.Count = 1;
-	sd.SampleDesc.Quality = 0;
-	sd.BufferCount = 2;
-	sd.OutputWindow = handle;
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.Windowed = true;
-
-	unsigned int debugFlags = 0;
+	unsigned int debugFlags                 = 0;
 
 #ifdef _DEBUG
 	debugFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif // _DEBUG
 
-	HRESULT hr = D3D11CreateDeviceAndSwapChain(
+	HRUN(D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
@@ -83,153 +59,90 @@ void Renderer::createDeviceAndSwapChain(HWND handle) {
 		&m_device,
 		nullptr,
 		&m_context
-	);
-	if (FAILED(hr)) {
-		MessageBoxA(nullptr, "Failed to create D3D11 device/swapchain", "Error", MB_OK);
-	}
+	));
 }
 
 void Renderer::createRenderTargetView() {
-	ID3D11Resource* p_backBuffer = nullptr;
-	m_swapchain->GetBuffer(0, __uuidof(ID3D11Resource), (void**)&p_backBuffer);
+	wrl::ComPtr<ID3D11Texture2D> pBackBuffer;
+	HRUN(m_swapchain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
 
-	if (!p_backBuffer) {
-		std::println("unable to fetch back buffer");
-		std::abort();
-	}
-	HRESULT hr = m_device->CreateRenderTargetView(p_backBuffer, nullptr, &m_targetView);
+	D3D11_TEXTURE2D_DESC bbDesc;
+	pBackBuffer->GetDesc(&bbDesc);
 
-	if (FAILED(hr)) {
-		MessageBoxA(nullptr, "Failed to create D3D11 device/swapchain", "Error", MB_OK);
-	}
-	p_backBuffer->Release();
-}
-
-void Renderer::createViewport() {
-	D3D11_VIEWPORT vp = { 0 };
-	vp.TopLeftX = 0.0f;
-	vp.TopLeftY = 0.0f;
-	vp.Width = 1600.0f;
-	vp.Height = 900.0f;
+	m_renderWidth = bbDesc.Width;
+	m_renderHeight = bbDesc.Height;
+	HRUN(m_device->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &m_targetView));
 	
-	m_context->RSSetViewports(1, &vp);
 }
 
-void Renderer::createDepthStencil() {
+
+void Renderer::createViewPort() {
+	m_viewPort.TopLeftX       = 0;
+	m_viewPort.TopLeftY       = 0;
+	m_viewPort.Width          = static_cast <float>(m_renderWidth);
+	m_viewPort.Height         = static_cast <float>(m_renderHeight);
+	m_viewPort.MinDepth		  = 0.0f;
+	m_viewPort.MaxDepth		  = 1.0f;
+}
+
+void Renderer::createDepthStencilState() {
 
 	D3D11_DEPTH_STENCIL_DESC dsd = {};
-	dsd.DepthEnable = true;
-	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsd.DepthFunc = D3D11_COMPARISON_LESS;
-	dsd.StencilEnable = false;
+	dsd.DepthEnable				 = TRUE;
+	dsd.DepthWriteMask			 = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsd.DepthFunc				 = D3D11_COMPARISON_LESS;
+	dsd.StencilEnable			 = FALSE;
 
 	HRUN(m_device->CreateDepthStencilState(&dsd, &m_stencilState));
-	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 1), m_device.Get());
 
-	D3D11_TEXTURE2D_DESC t2d = { 0 };
-	t2d.Width = 1600;
-	t2d.Height = 900;
-	t2d.MipLevels = 1;
-	t2d.ArraySize = 1;
-	//t2d.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	t2d.Format = DXGI_FORMAT_D32_FLOAT;
-	t2d.SampleDesc.Count = 1;
-	t2d.SampleDesc.Quality = 0;
-	t2d.Usage = D3D11_USAGE_DEFAULT;
-	t2d.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	t2d.CPUAccessFlags = 0;
-	t2d.MiscFlags = 0;
-
-	wrl::ComPtr <ID3D11Texture2D> depthStencilTexture;
-	HRUN(m_device->CreateTexture2D(&t2d, nullptr, &depthStencilTexture));
-
-
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsv = {};
-	dsv.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	dsv.Format = DXGI_FORMAT_D32_FLOAT;
-	dsv.Texture2D.MipSlice = 0;
-
-	HRUN(m_device->CreateDepthStencilView(depthStencilTexture.Get(), &dsv, &m_stencilView));	
 }
 
-void Renderer::createSamplerState() {
-	D3D11_SAMPLER_DESC sd = {};
-	sd.Filter   = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+void Renderer::createDepthStencilView() {
+
+
+	D3D11_TEXTURE2D_DESC td = {};
+	td.Width                = m_renderWidth;
+	td.Height               = m_renderHeight;
+	td.MipLevels            = 1;
+	td.ArraySize			= 1;
+	td.Format				= DXGI_FORMAT_D24_UNORM_S8_UINT;
+	td.SampleDesc.Quality   = 0;
+	td.SampleDesc.Count		= 1;
+	td.Usage				= D3D11_USAGE_DEFAULT;
+	td.BindFlags			= D3D11_BIND_DEPTH_STENCIL;
+	td.CPUAccessFlags		= 0;
+	td.MiscFlags			= 0;
+
+	wrl::ComPtr <ID3D11Texture2D> depthTexture;
+	HRUN(m_device->CreateTexture2D(&td, nullptr, &depthTexture));
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = {};
+	dsvd.Format						   = td.Format;
+	dsvd.ViewDimension				   = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvd.Texture2D.MipSlice			   = 0;
+
+	HRUN(m_device->CreateDepthStencilView(depthTexture.Get(), &dsvd, &m_stencilView));
 	
-	m_device->CreateSamplerState(&sd, &m_samplerState);
-	m_context->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
 }
 
-void Renderer::createRasterizer() {
-	D3D11_RASTERIZER_DESC rd = {};
-	rd.FillMode = D3D11_FILL_SOLID;
-	rd.CullMode = D3D11_CULL_BACK;
-	rd.FrontCounterClockwise = false;
-	rd.DepthClipEnable = true;
+void Renderer::preRender() {
+	ID3D11RenderTargetView* rtvs[] = { m_targetView.Get() };
 
-	HRUN(m_device->CreateRasterizerState(&rd, &m_rasterizerState));
-	RUN(m_context->RSSetState(m_rasterizerState.Get()), m_device.Get());
+	RUN(m_context->OMSetRenderTargets(1, rtvs, m_stencilView.Get()), m_device);
+	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 0), m_device);
+	RUN(m_context->RSSetViewports(1, &m_viewPort), m_device);
+	RUN(m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST), m_device);
 }
 
-void Renderer::createBlendState() {
-	D3D11_BLEND_DESC bd = {};
-
-	bd.AlphaToCoverageEnable = false;
-	bd.IndependentBlendEnable = false;
-
-	bd.RenderTarget[0].BlendEnable = false;
-	bd.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-	bd.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
-	bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-
-	bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-
-	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-	HRUN(m_device->CreateBlendState(&bd, &m_blendState));
-	RUN(m_context->OMSetBlendState(m_blendState.Get(), m_blendFactor, 0xFFFFFFFF), m_device.Get());
-}
-
-void Renderer::setViewPortAndDepthStencil() {
-	RUN(m_context->OMSetRenderTargets(1, m_targetView.GetAddressOf(), m_stencilView.Get()), m_device);
-}
-
-void Renderer::wipeOff() {
-	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 0), m_device.Get());
-	RUN(m_context->OMSetRenderTargets(1, m_targetView.GetAddressOf(), m_stencilView.Get()), m_device);
-	RUN(m_context->OMSetBlendState(m_blendState.Get(), m_blendFactor, 0xFFFFFFFF), m_device.Get());
-	RUN(m_context->RSSetState(m_rasterizerState.Get()), m_device.Get());
-
-
-	RUN(m_context->ClearRenderTargetView(m_targetView.Get(), m_clearColor), m_device);
+void Renderer::clear() {
+	RUN(m_context->ClearRenderTargetView(m_targetView.Get(), m_clearColor.data()), m_device);
 	RUN(m_context->ClearDepthStencilView(m_stencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0), m_device);
 }
 
-void Renderer::flipBuffers() {
-	m_swapchain->Present(m_vSync, 0);
+void Renderer::swap() {
+	RUN(m_swapchain->Present(1, 0), m_device);
 }
 
-void Renderer::clearColor(float r, float g, float b, float a) {
-	m_clearColor[0] = r;
-	m_clearColor[1] = g;
-	m_clearColor[2] = b;
-	m_clearColor[3] = a;
-}
-
-void Renderer::vSync(bool condition) {
-	m_vSync = condition;
-}
-
-void Renderer::indexedRender(int size) {
-	RUN(m_context->DrawIndexed(size, 0, 0), m_device);
-}
-
-Renderer::~Renderer() {
-	ImGui_ImplDX11_Shutdown();
+void Renderer::drawIndexed(unsigned int count) {
+	RUN(m_context->DrawIndexed(count, 0, 0), m_device);
 }

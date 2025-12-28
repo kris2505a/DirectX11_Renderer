@@ -1,28 +1,24 @@
-#include "InputLayout.h"
-#include "Shader.h"
-#include "ErrorH.h"
+#include "InputLayout.hpp"
+#include "Error.hpp"
 
-InputLayout::InputLayout(const Blobs* blobs) : p_blobs(blobs) {}
+
+InputLayout::InputLayout(const Blobs* blobs)
+	: p_blobs(blobs) {}
 
 void InputLayout::bind() const {
 	RUN(context()->IASetInputLayout(m_layout.Get()), device());
 }
 
-void InputLayout::unbind() const {
-	ID3D11InputLayout* nullLayout = nullptr;
-	context()->IASetInputLayout(nullLayout);
-}
-
 void InputLayout::addLayout(D3D11_INPUT_ELEMENT_DESC desc) {
-	m_desc.push_back(desc);
+	m_layouts.push_back(std::move(desc));
 }
 
-void InputLayout::createLayouts() {
+void InputLayout::createLayout() {
 	HRUN(device()->CreateInputLayout(
-		m_desc.data(),
-		std::size(m_desc),
+		m_layouts.data(),
+		m_layouts.size(),
 		p_blobs->vsBlob->GetBufferPointer(),
 		p_blobs->vsBlob->GetBufferSize(),
-		&m_layout
+		m_layout.GetAddressOf()
 	));
 }

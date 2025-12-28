@@ -1,29 +1,25 @@
-#include "VertexBuffer.h"
-#include "ErrorH.h"
+#include "VertexBuffer.hpp"
+#include "Error.hpp"
 
-VertexBuffer::VertexBuffer(const void* data, int size, unsigned int stride, unsigned int offset) 
-	: m_stride(stride), m_offset(offset) {
-	D3D11_BUFFER_DESC vbd = {};
-	vbd.Usage = D3D11_USAGE_DYNAMIC;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	vbd.MiscFlags = 0;
-	vbd.ByteWidth = size;
-	vbd.StructureByteStride = stride;
+VertexBuffer::VertexBuffer(const void* data, unsigned int count, unsigned int stride, unsigned int offset)
+	: m_stride(stride), m_offset(offset)
+{
 
-	D3D11_SUBRESOURCE_DATA vsd = {};
-	vsd.pSysMem = data;
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = 0;
+	bd.MiscFlags = 0;
+	bd.ByteWidth = m_stride * count;
+	bd.StructureByteStride = m_stride;
 
-	HRUN(device()->CreateBuffer(&vbd, &vsd, &m_buffer));
+	D3D11_SUBRESOURCE_DATA srd = {};
+	srd.pSysMem = data;
+
+	HRUN(device()->CreateBuffer(&bd, &srd, &m_buffer));
 }
 
-void VertexBuffer::bind() const {
+void VertexBuffer::bind() const
+{
 	RUN(context()->IASetVertexBuffers(0, 1, m_buffer.GetAddressOf(), &m_stride, &m_offset), device());
-}
-
-void VertexBuffer::unbind() const {
-	ID3D11Buffer* nullBuffer = nullptr;
-	UINT stride = 0;
-	UINT offset = 0;
-	context()->IASetVertexBuffers(0, 1, &nullBuffer, &stride, &offset);
 }
