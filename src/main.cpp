@@ -22,9 +22,7 @@ int main() {
 
     bool open = true;
     SDL_Event e;
-
-   
-
+    
     DbgCube cube;
     cube.transform()->position.x = 0.5f;
     cube.transform()->position.z = 2.0f;
