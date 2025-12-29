@@ -80,12 +80,4 @@ if (WIN32)
     )
 endif()
 
-# ------------------------------------------------------------
-# GLM (header-only)
-# thirdparty/glm/glm/glm.hpp
-# ------------------------------------------------------------
-target_include_directories(Not-Dx11 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/glm
-)
-
 # TODO: Add tests and install targets if needed.
