@@ -1,6 +1,6 @@
 #pragma once
-#include <glm.hpp>
+#include <DirectXMath.h>
 
 struct Vertex {
-    glm::vec3 position;
+    DirectX::XMFLOAT3 position;
 };

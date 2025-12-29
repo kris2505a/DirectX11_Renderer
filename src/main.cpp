@@ -1,25 +1,18 @@
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#define GLM_FORCE_LEFT_HANDED
-#define GLM_FORCE_ROW_MAJOR
-#define WIN32_LEAN_AND_MEAN
-
 #include <SDL_syswm.h>
 #include <SDL.h>
 #include <windows.h>
+#include <iostream>
 
 #include "Renderer.hpp"
-#include "Vertex.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
 #include "InputLayout.hpp"
 #include "Shader.hpp"
 
+#include "DbgCube.hpp"
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window* window = SDL_CreateWindow("Not-Dx11", 100, 100, 1280, 720, 0);
+    SDL_Window* window = SDL_CreateWindow("Not-Dx11", 100, 100, 1280, 720, SDL_WINDOW_SHOWN);
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
     SDL_GetWindowWMInfo(window, &wmInfo);
@@ -30,22 +23,16 @@ int main() {
     bool open = true;
     SDL_Event e;
 
-    Vertex vertices[] {
-        {{-0.5f, -0.5f, 0.0f}},
-        {{ 0.0f,  0.5f, 0.0f}},
-        {{ 0.5f, -0.5f, 0.0f}}
-    };
-    
-    uint32_t indices[] = {
-        0, 1, 2
-    };
+   
 
-    VertexBuffer vbo(vertices, 3, sizeof(Vertex));
-    IndexBuffer ibo(indices, 3);
-    Shader shader(L"Shader/VertexShader.hlsl", L"Shader/PixelShader.hlsl");
-    InputLayout ilo(shader.blobs());
-    ilo.addLayout({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-    ilo.createLayout();
+    DbgCube cube;
+    cube.transform()->position.x = 0.5f;
+    cube.transform()->position.z = 2.0f;
+    cube.color = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+    DbgCube cube2;
+    cube2.transform()->position.x = 0.0f;
+    cube2.color = { 0.0f, 1.0f, 0.0f, 1.0f };
 
     while(open) {
         while(SDL_PollEvent(&e)) {
@@ -56,12 +43,11 @@ int main() {
         renderer.clear();
         renderer.preRender();    
         
-        vbo.bind();
-        ibo.bind();
-        shader.bind();
-        ilo.bind();
+        cube.update(1.0f);
+        cube2.update(1.0f);
 
-        renderer.drawIndexed(ibo.indexCount());
+        cube.render();
+        cube2.render();
 
         renderer.swap();
     }

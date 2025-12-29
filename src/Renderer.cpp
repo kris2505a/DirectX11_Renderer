@@ -21,6 +21,26 @@ Renderer::Renderer(HWND handle) {
 	createViewPort();
 
 	preRender();
+
+	auto dummy = dx::XMMatrixIdentity();
+
+	m_vcbo = new ConstantBuffer(&dummy, sizeof(dummy), ShaderType::VertexShader);
+	
+	auto colorDummy = dx::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pcbo = new ConstantBuffer(&colorDummy, sizeof(colorDummy), ShaderType::PixelShader);
+
+	m_view = dx::XMMatrixLookAtLH(
+		{ 0.0f, 0.0f, -3.0f, 1.0f },
+		{ 0.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f, 0.0f }
+	);
+
+	m_proj = dx::XMMatrixPerspectiveFovLH(dx::XMConvertToRadians(45.0f), 16.0f / 9.0f, 0.01f, 100.0f);
+
+	m_shader = new Shader(L"Shader/VertexShader.hlsl", L"Shader/PixelShader.hlsl");
+	m_ilo = new InputLayout(m_shader->blobs());
+	m_ilo->addLayout({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+	m_ilo->createLayout();
 }
 
 void Renderer::createDeviceSwapChain() {
@@ -145,4 +165,11 @@ void Renderer::swap() {
 
 void Renderer::drawIndexed(unsigned int count) {
 	RUN(m_context->DrawIndexed(count, 0, 0), m_device);
+}
+
+Renderer::~Renderer() {
+	delete m_vcbo;
+	delete m_pcbo;
+	delete m_ilo;
+	delete m_shader;
 }
