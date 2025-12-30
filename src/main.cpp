@@ -7,7 +7,7 @@
 #include "InputLayout.hpp"
 #include "Shader.hpp"
 
-#include "DbgCube.hpp"
+#include "Sphere.hpp"
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
@@ -23,14 +23,7 @@ int main() {
     bool open = true;
     SDL_Event e;
     
-    DbgCube cube;
-    cube.transform()->position.x = 0.5f;
-    cube.transform()->position.z = 2.0f;
-    cube.color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-    DbgCube cube2;
-    cube2.transform()->position.x = 0.0f;
-    cube2.color = { 0.0f, 1.0f, 0.0f, 1.0f };
+    Sphere sphere;
 
     while(open) {
         while(SDL_PollEvent(&e)) {
@@ -41,11 +34,8 @@ int main() {
         renderer.clear();
         renderer.preRender();    
         
-        cube.update(1.0f);
-        cube2.update(1.0f);
-
-        cube.render();
-        cube2.render();
+        sphere.update(1.0f);
+        sphere.render();
 
         renderer.swap();
     }
