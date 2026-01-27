@@ -5,6 +5,8 @@
 #include <memory>
 #include <DirectXMath.h>
 
+namespace dxr {
+
 enum class MaterialType {
 	SolidColor,
 	Texture
@@ -37,3 +39,5 @@ private:
 
 	static std::shared_ptr <MaterialSharedStates> s_sharedInstance;
 };
+
+}

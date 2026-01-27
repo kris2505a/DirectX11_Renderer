@@ -2,6 +2,8 @@
 #include "Vertex.h"
 #include <vector>
 
+namespace dxr {
+
 std::shared_ptr <MeshSharedState> MeshSharedState::s_cubeMesh;
 
 void Mesh::bind() {
@@ -91,3 +93,4 @@ std::unique_ptr<Mesh> Mesh::createCubeMesh() {
     return mesh;
 }
 
+}

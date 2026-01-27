@@ -1,6 +1,8 @@
 #include "VertexBuffer.h"
 #include "Error.h"
 
+namespace dxr {
+
 VertexBuffer::VertexBuffer(const void* data, unsigned int count, unsigned int stride, unsigned int offset)
 	: m_stride(stride), m_offset(offset)
 {
@@ -22,4 +24,6 @@ VertexBuffer::VertexBuffer(const void* data, unsigned int count, unsigned int st
 void VertexBuffer::bind() const
 {
 	RUN(context()->IASetVertexBuffers(0, 1, m_buffer.GetAddressOf(), &m_stride, &m_offset), device());
+}
+
 }

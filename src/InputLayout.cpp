@@ -1,6 +1,7 @@
 #include "InputLayout.h"
 #include "Error.h"
 
+namespace dxr {
 
 InputLayout::InputLayout(const Blobs* blobs)
 	: p_blobs(blobs) {}
@@ -21,4 +22,6 @@ void InputLayout::createLayout() {
 		p_blobs->vsBlob->GetBufferSize(),
 		m_layout.GetAddressOf()
 	));
+}
+
 }

@@ -2,6 +2,8 @@
 #include <cstdint>
 #include "Error.h"
 
+namespace dxr {
+
 IndexBuffer::IndexBuffer(const void* indices, unsigned int count, unsigned int offset) 
     : m_offset(offset), m_count(count) {
 	D3D11_BUFFER_DESC bd = {};
@@ -24,4 +26,6 @@ void IndexBuffer::bind() const {
 
 unsigned int IndexBuffer::indexCount() const {
 	return m_count;
+}
+
 }

@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+{
+
 class Mesh {
 	friend class Renderer;
 public:
@@ -27,3 +29,5 @@ private:
 
 	static std::shared_ptr <MeshSharedState> s_cubeMesh;
 };
+
+}

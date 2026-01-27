@@ -1,6 +1,7 @@
 #pragma once
 #include "BindsBase.h"
 
+namespace dxr {
 
 class VertexBuffer : public BindsBase {
 public:
@@ -13,3 +14,5 @@ private:
     unsigned int m_stride;
     unsigned int m_offset;
 };
+
+}

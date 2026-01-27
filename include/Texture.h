@@ -2,6 +2,8 @@
 #include "BindsBase.h"
 #include <string>
 
+namespace dxr {
+
 class Texture : public BindsBase {
 public:
 	Texture(const std::string& path);
@@ -13,3 +15,5 @@ private:
 	wrl::ComPtr <ID3D11ShaderResourceView> m_textureResourceView;
 	std::string m_path;
 };
+
+}

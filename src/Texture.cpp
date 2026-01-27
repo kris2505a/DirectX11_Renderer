@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include "Error.h"
 
+namespace dxr {
+
 Texture::Texture(const std::string& path) 
 	: m_path(path) {
 
@@ -40,4 +42,6 @@ Texture::Texture(const std::string& path)
 
 void Texture::bind() const {
 	RUN(context()->PSSetShaderResources(0, 1, m_textureResourceView.GetAddressOf()), device());
+}
+
 }

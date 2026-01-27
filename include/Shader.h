@@ -3,6 +3,8 @@
 #include <string>
 #include "Blobs.h"
 
+namespace dxr {
+
 class Shader : public BindsBase {
 public:
     Shader(const std::wstring& vsPath, const std::wstring& psPath);
@@ -15,3 +17,5 @@ private:
     wrl::ComPtr <ID3D11PixelShader> m_pixelShader;
     Blobs m_blobs;
 };
+
+}

@@ -1,6 +1,8 @@
 #include "ConstantBuffer.h"
 #include "Error.h"
 
+namespace dxr {
+
 ConstantBuffer::ConstantBuffer(const void* data, int size, ShaderType type)
 	: m_type(type) {
 	D3D11_BUFFER_DESC bd = {};
@@ -31,4 +33,6 @@ void ConstantBuffer::update(const void* data, int size) {
 	RUN(context()->Map(m_buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &map), device());
 	memcpy(map.pData, data, size);
 	RUN(context()->Unmap(m_buffer.Get(), 0), device());
+}
+
 }

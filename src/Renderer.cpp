@@ -1,6 +1,8 @@
 #include "Renderer.h"
 #include "Error.h"
 
+namespace dxr {
+
 struct VertexConstantBufferData {
 	DirectX::XMMATRIX invModel;
 	DirectX::XMMATRIX mvp;
@@ -290,5 +292,7 @@ ID3D11DeviceContext* Renderer::getContext() {
 
 
 Renderer::~Renderer() {
+
+}
 
 }

@@ -2,6 +2,8 @@
 #include "BindsBase.h"
 #include "ShaderType.h"
 
+namespace dxr {
+
 class ConstantBuffer : public BindsBase {
 public:
     ConstantBuffer(const void* data, int size, ShaderType type);
@@ -13,3 +15,5 @@ private:
     wrl::ComPtr <ID3D11Buffer> m_buffer;
     ShaderType m_type;
 };
+
+}

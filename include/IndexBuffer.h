@@ -1,6 +1,8 @@
 #pragma once
 #include "BindsBase.h"
 
+namespace dxr {
+
 class IndexBuffer : public BindsBase {
 public:
     IndexBuffer(const void* indices, unsigned int count, unsigned int offset = 0);
@@ -13,3 +15,5 @@ private:
     unsigned int m_offset;
     unsigned int m_count;
 };
+
+}

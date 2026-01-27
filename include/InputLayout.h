@@ -3,6 +3,7 @@
 #include "Blobs.h"
 #include <vector>
 
+namespace dxr {
 
 class InputLayout : public BindsBase {
 public:
@@ -18,3 +19,5 @@ private:
 
 	const Blobs* p_blobs;
 };
+
+}

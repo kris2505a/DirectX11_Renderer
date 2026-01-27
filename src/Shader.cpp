@@ -3,6 +3,8 @@
 #include "Error.h"
 #include <d3dcompiler.h>
 
+namespace dxr {
+
 Shader::Shader(const std::wstring& vsPath, const std::wstring& psPath) {
 
     HRUN(D3DReadFileToBlob(vsPath.c_str(), &m_blobs.vsBlob));
@@ -31,4 +33,6 @@ void Shader::bind() const {
 
 const Blobs* Shader::blobs() const {
     return &m_blobs;
+}
+
 }

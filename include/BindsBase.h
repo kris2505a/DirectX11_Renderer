@@ -5,6 +5,8 @@
 
 namespace wrl = Microsoft::WRL;
 
+namespace dxr {
+
 class BindsBase {
 public:
     BindsBase() = default;
@@ -15,3 +17,5 @@ public:
 
     virtual void bind() const = 0;
 };
+
+}

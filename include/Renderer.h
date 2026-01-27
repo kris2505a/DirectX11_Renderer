@@ -8,6 +8,8 @@
 
 namespace wrl = Microsoft::WRL;
 
+namespace dxr {
+
 class Renderer {
     friend class BindsBase;
     friend class Entity;
@@ -67,3 +69,5 @@ private:
 
     static Renderer* s_instance;
 };
+
+}

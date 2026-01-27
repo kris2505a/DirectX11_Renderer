@@ -1,5 +1,7 @@
 #include "Material.h"
 
+namespace dxr {
+
 std::shared_ptr <MaterialSharedStates> MaterialSharedStates::s_sharedInstance;
 
 const DirectX::XMFLOAT4& Material::getColor() const {
@@ -76,3 +78,4 @@ void Material::bind() const {
 	}
 }
 
+}
