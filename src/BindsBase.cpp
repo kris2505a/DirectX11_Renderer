@@ -1,10 +1,10 @@
-#include "BindsBase.hpp"
-#include "Renderer.hpp"
+#include "BindsBase.h"
+#include "Renderer.h"
 
 ID3D11Device* BindsBase::device() const {
-    return Renderer::s_instance->m_device.Get();
+    return Renderer::getDevice();
 }
 
 ID3D11DeviceContext* BindsBase::context() const {
-    return Renderer::s_instance->m_context.Get();
+    return Renderer::getContext();
 }

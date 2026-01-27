@@ -1,5 +1,5 @@
-#include "VertexBuffer.hpp"
-#include "Error.hpp"
+#include "VertexBuffer.h"
+#include "Error.h"
 
 VertexBuffer::VertexBuffer(const void* data, unsigned int count, unsigned int stride, unsigned int offset)
 	: m_stride(stride), m_offset(offset)

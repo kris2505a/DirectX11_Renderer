@@ -1,5 +1,5 @@
-#include "ConstantBuffer.hpp"
-#include "Error.hpp"
+#include "ConstantBuffer.h"
+#include "Error.h"
 
 ConstantBuffer::ConstantBuffer(const void* data, int size, ShaderType type)
 	: m_type(type) {

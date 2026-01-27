@@ -1,5 +1,5 @@
-#include "InputLayout.hpp"
-#include "Error.hpp"
+#include "InputLayout.h"
+#include "Error.h"
 
 
 InputLayout::InputLayout(const Blobs* blobs)

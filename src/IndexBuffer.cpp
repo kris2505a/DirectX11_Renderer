@@ -1,6 +1,6 @@
-#include "IndexBuffer.hpp"
+#include "IndexBuffer.h"
 #include <cstdint>
-#include "Error.hpp"
+#include "Error.h"
 
 IndexBuffer::IndexBuffer(const void* indices, unsigned int count, unsigned int offset) 
     : m_offset(offset), m_count(count) {

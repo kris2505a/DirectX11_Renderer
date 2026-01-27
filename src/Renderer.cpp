@@ -1,5 +1,16 @@
-#include "Renderer.hpp"
-#include "Error.hpp"
+#include "Renderer.h"
+#include "Error.h"
+
+struct VertexConstantBufferData {
+	DirectX::XMMATRIX invModel;
+	DirectX::XMMATRIX mvp;
+};
+
+struct PixelConstantBufferData {
+	DirectX::XMFLOAT4 color;
+	int hasTexture = 0;
+	//int padding[3];
+};
 
 Renderer* Renderer::s_instance = nullptr;
 
@@ -16,32 +27,29 @@ Renderer::Renderer(HWND handle) {
 
 	createDeviceSwapChain();
 	createRenderTargetView();
-	createDepthStencilState();
-	createDepthStencilView();
+	//createDepthStencilState();
+	//createDepthStencilView();
 	createViewPort();
+	createRasterizerState();
+	createSamplerState();
 
-	preRender();
+	preRenderImpl();
 
-	auto dummy = dx::XMMatrixIdentity();
-
-	m_vcbo = new ConstantBuffer(&dummy, sizeof(dummy), ShaderType::VertexShader);
+	//temp bindings
+	VertexConstantBufferData vcd;
+	vcd.invModel = DirectX::XMMatrixIdentity();
+	vcd.mvp = DirectX::XMMatrixIdentity();
+	m_vertexCBO = std::make_unique <ConstantBuffer>(&vcd, sizeof(vcd), ShaderType::VertexShader);
 	
-	auto colorDummy = dx::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_pcbo = new ConstantBuffer(&colorDummy, sizeof(colorDummy), ShaderType::PixelShader);
+	PixelConstantBufferData pcd;
+	pcd.color = { 0.0f, 0.0f, 0.0f, 1.0f };
+	pcd.hasTexture = 0;
+	m_pixelCBO = std::make_unique <ConstantBuffer>(&pcd, sizeof(pcd), ShaderType::PixelShader);
 
-	m_view = dx::XMMatrixLookAtLH(
-		{ 0.0f, 0.0f, -3.0f, 1.0f },
-		{ 0.0f, 0.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f, 0.0f }
-	);
-
-	m_proj = dx::XMMatrixPerspectiveFovLH(dx::XMConvertToRadians(45.0f), 16.0f / 9.0f, 0.01f, 100.0f);
-
-	m_shader = new Shader(L"Shader/VertexShader.hlsl", L"Shader/PixelShader.hlsl");
-	m_ilo = new InputLayout(m_shader->blobs());
-	m_ilo->addLayout({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-	m_ilo->createLayout();
+	p_activeCamera = nullptr;
 }
+
+#pragma region Initializations
 
 void Renderer::createDeviceSwapChain() {
 	DXGI_SWAP_CHAIN_DESC sd                 = {};
@@ -145,13 +153,40 @@ void Renderer::createDepthStencilView() {
 	
 }
 
-void Renderer::preRender() {
+void Renderer::createRasterizerState() {
+	D3D11_RASTERIZER_DESC rd{};
+
+	rd.DepthClipEnable = true;
+	rd.FrontCounterClockwise = true;
+	rd.FillMode = D3D11_FILL_SOLID;
+	rd.CullMode = D3D11_CULL_BACK;
+
+	HRUN(m_device->CreateRasterizerState(&rd, m_rasterizerState.GetAddressOf()));
+	RUN(m_context->RSSetState(m_rasterizerState.Get()), m_device);
+}
+
+void Renderer::createSamplerState() {
+	D3D11_SAMPLER_DESC sd{};
+	sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
+	HRUN(m_device->CreateSamplerState(&sd, m_samplerState.GetAddressOf()));
+	RUN(m_context->PSSetSamplers(0, 1, m_samplerState.GetAddressOf()), m_device);
+}
+
+#pragma endregion
+
+void Renderer::preRenderImpl() {
 	ID3D11RenderTargetView* rtvs[] = { m_targetView.Get() };
 
 	RUN(m_context->OMSetRenderTargets(1, rtvs, m_stencilView.Get()), m_device);
 	RUN(m_context->OMSetDepthStencilState(m_stencilState.Get(), 0), m_device);
 	RUN(m_context->RSSetViewports(1, &m_viewPort), m_device);
 	RUN(m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST), m_device);
+
+	this->clear();
 }
 
 void Renderer::clear() {
@@ -167,9 +202,93 @@ void Renderer::drawIndexed(unsigned int count) {
 	RUN(m_context->DrawIndexed(count, 0, 0), m_device);
 }
 
+void Renderer::renderImpl(const Entity* entity) {
+	entity->m_mesh->bind();
+	entity->m_material->bind();
+
+	auto model = entity->getTransform().model();
+
+	VertexConstantBufferData vcbd;
+	
+	vcbd.invModel = DirectX::XMMatrixTranspose(
+		DirectX::XMMatrixInverse(
+			nullptr, model
+		)
+	);
+
+
+	if (p_activeCamera) {
+		vcbd.mvp = DirectX::XMMatrixTranspose(
+			entity->getTransform().model() *
+			p_activeCamera->viewMat() *
+			p_activeCamera->projMat()
+		);
+	}
+
+	else {
+		vcbd.mvp = DirectX::XMMatrixTranspose(
+			entity->getTransform().model() *
+			m_defaultCamera.viewMat() *
+			m_defaultCamera.projMat()
+		);
+	}
+	
+	m_vertexCBO->update(&vcbd, sizeof(vcbd));
+
+	PixelConstantBufferData pcbd;
+	
+	pcbd.color = entity->m_material->getColor();
+	
+	if (entity->m_material->m_type == MaterialType::Texture) {
+		pcbd.hasTexture = 1;
+	}
+
+	m_pixelCBO->update(&pcbd, sizeof(pcbd));
+
+	m_vertexCBO->bind();
+	m_pixelCBO->bind();
+	RUN(m_context->DrawIndexed(entity->m_mesh->getIndexCount(), 0, 0), m_device);
+}
+
+void Renderer::postRenderImpl() {
+	this->swap();
+}
+
+void Renderer::setActiveCamera(Camera* camera) {
+	p_activeCamera = camera;
+}
+
+void Renderer::preRender() {
+	if (!s_instance)
+		return;
+	s_instance->preRenderImpl();
+}
+
+void Renderer::postRender() {
+	if (!s_instance)
+		return;
+	s_instance->postRender();
+}
+
+void Renderer::renderSubmit(const Entity* entity) {
+	if (!s_instance)
+		return;
+	s_instance->renderImpl(entity);
+}
+
+ID3D11Device* Renderer::getDevice() {
+	if (!s_instance)
+		return nullptr;
+	return s_instance->m_device.Get();
+}
+
+ID3D11DeviceContext* Renderer::getContext() {
+	if (!s_instance)
+		return nullptr;
+	return s_instance->m_context.Get();
+}
+
+
 Renderer::~Renderer() {
-	delete m_vcbo;
-	delete m_pcbo;
-	delete m_ilo;
-	delete m_shader;
+
 }
